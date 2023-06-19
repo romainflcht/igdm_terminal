@@ -1,5 +1,5 @@
-# igdm_terminal
-This project allows you to see your instagram conversation on your terminal :).
+# IGDTerm
+This project allows you to see your instagram direct messages on your terminal :)
 
 ## Installation
 To install all the necessary libraries, you will need to use:
@@ -39,7 +39,8 @@ Once you have those, you can run the `main.py` file and enter your login informa
   <i>Login successful !</i>
 </p>
 
-⚠️ Be careful! Those login information are currently saved in clear inside a text file. I will soon release a crypt/decrypt feature to protect them.
+⚠️ Be careful! The login information is currently saved in plain text inside a text file. I will soon release a 
+cryptographic encryption/decryption feature to protect them.
 
 ## Enjoy :)
 Here is some screenshots of the program running : 
@@ -57,15 +58,15 @@ Here is some screenshots of the program running :
 </p>
 
 Supported features : 
-- Text
-- Link
-- Clip
-- Media share (images & video)
-- voice media
-- See Once media
-- Story share
-- Reel share
-- Liked messages
+- 📄 Text
+- 🌐 Link
+- 🎬 Clip
+- 🖼️ Media share (images & video)
+- 🔊 Voice media
+- 📷 See Once media
+- 📖 Story share
+- 📹 Reel share
+- ❤️ Liked messages
 
 ## Licence
 - romainflcht
