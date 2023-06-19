@@ -1,4 +1,4 @@
-# IGDTerm
+# igdm_terminal
 This project allows you to see your instagram direct messages on your terminal :)
 
 ## Installation
