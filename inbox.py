@@ -7,7 +7,7 @@ import requests
 class Inbox:
     URL = 'https://i.instagram.com/api/v1/direct_v2/inbox/'
 
-    def __init__(self, cookies: dict, headers: dict) -> None:
+    def __init__(self, console: Console, cookies: dict, headers: dict) -> None:
         """
         Constructor of the Inbox class.
         :param cookies: Cookies that contain session id.
@@ -16,7 +16,7 @@ class Inbox:
         self._cookies = cookies
         self._headers = headers
         self._session = requests.Session()
-        self._console = Console()
+        self._console = console
         self._threads = []
         self._unseencount = 0
 
@@ -64,6 +64,9 @@ class Inbox:
 
         # Footer :).
         self._console.print('coded by romainflcht', style='#3b3b3b', justify='right')
+
+    def get_thread(self, thread_id):
+        return self._threads[thread_id]
 
 
 if __name__ == '__main__':

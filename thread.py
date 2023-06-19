@@ -220,6 +220,8 @@ class Thread:
         thread.add_row(('[bold]' if self._readed else '[#3b3b3b]') + self._last_item[0])
         self._console.print(Panel(thread))
 
+    def get_items(self):
+        return self._items
 
 if __name__ == '__main__':
     print('This code is intended to be imported...')

@@ -1,4 +1,6 @@
 from fetch_data import fetch_username_by_id, fetch_profile_pic_by_id
+from rich.console import Console
+from rich.prompt import IntPrompt
 from PIL import Image
 import datetime
 import requests
@@ -213,6 +215,33 @@ def format_link(text: str):
     parsed_text += text[index:]
 
     return parsed_text
+
+
+def format_thread_selection(console: Console, max_thead_nb: int) -> int:
+    """
+    Function that ask thread number to the user and return his choice parsed.
+    :param console:
+    :param max_thead_nb:
+    :return:
+    """
+    is_valid_thread_id = False
+    thread_id = 0
+
+    while not is_valid_thread_id:
+        # Ask the conversation number.
+        thread_id = IntPrompt.ask(f'Selectionnez la conversation : (1-{max_thead_nb})')
+
+        # Check if the number is valid.
+        if 0 < thread_id <= max_thead_nb:
+            is_valid_thread_id = True
+
+        else:
+            # Tell the user that hiw choice is not correct.
+            console.print('La conversation sélectionné n\'existe pas, veuillez réessayer...')
+            is_valid_thread_id = False
+
+    # return the conversation number.
+    return thread_id - 1
 
 
 if __name__ == '__main__':
