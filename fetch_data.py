@@ -16,12 +16,17 @@ def fetch_username_by_id(session: requests.session, user_id: str) -> str:
     data = {}
 
     if os.path.isfile(os.path.join('cache', 'saved_usernames.json')):
-        with open(os.path.join('cache', 'saved_usernames.json'), 'r') as save_file:
-            data = json.load(save_file)
+        
+        # check if cache file isn't empty.
+        if os.stat(os.path.join('cache', 'saved_usernames.json')).st_size != 0 :
+            with open(os.path.join('cache', 'saved_usernames.json'), 'r') as save_file:
+                data = json.load(save_file)
 
-        # Check if the username is in the cache if not request the username and save it.
-        username = data.get(user_id)
+            # Check if the username is in the cache if not request the username and save it.
+            username = data.get(user_id)
 
+        # delete empty cache file if it's empty.
+        else: os.remove(os.path.join('cache', 'saved_usernames.json'))
     if username is None:
         req = session.get('https://i.instagram.com/api/v1/users/' + user_id + '/info/')
 
@@ -52,11 +57,13 @@ def fetch_profile_pic_by_id(session: requests.Session, user_id: str) -> str:
     data = {}
 
     if os.path.isfile(os.path.join('cache', 'saved_profile_pic.json')):
-        with open(os.path.join('cache', 'saved_profile_pic.json'), 'r') as save_file:
-            data = json.load(save_file)
+        if os.stat(os.path.join('cache', 'saved_profile_pic.json')).st_size != 0 : # check if cache file isn't empty || verifie que le fichier de cache n'est pas vide
+            with open(os.path.join('cache', 'saved_profile_pic.json'), 'r') as save_file:
+                data = json.load(save_file)
 
-        # Check if the profile picture is in the cache if not request it and save it.
-        colors = data.get(user_id)
+            # Check if the profile picture is in the cache if not request it and save it.
+            colors = data.get(user_id)
+        else: os.remove(os.path.join('cache', 'saved_profile_pic.json'))# delete empty cache file || efface le fichier de cache vide
 
     if colors is None:
         colors = []
