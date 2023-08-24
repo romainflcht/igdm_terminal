@@ -1,9 +1,6 @@
-import blowfish # from [here](https://github.com/jashandeep-sohi/python-blowfish)
 import os, json
 from rich.prompt import Prompt, Confirm
 from rich.console import Console
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 """
 THIS IS A WWARNING TO EVERYONE ATTEMPTING TO UNDERSTAND THIS
@@ -43,6 +40,9 @@ def openEncryptedData(console: Console) -> tuple:
                 resp = json.load(file)
             return (resp['session_id'], resp['csrf_token'])
         case "blowfish":
+            import blowfish # from [here](https://github.com/jashandeep-sohi/python-blowfish)
+            from cryptography.hazmat.primitives import hashes
+            from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
             match level:
                 case "ECB-CTS":
                     console.print(f"[bold #1279e0] encryption {style}-{level} détéctée")
@@ -64,6 +64,11 @@ def openEncryptedData(console: Console) -> tuple:
                     decrypted_bytes = b''.join(cipher.decrypt_ecb_cts(encr_data))
                     resp = json.loads(decrypted_bytes.decode(encoding='UTF-8'))
                     return (resp['session_id'], resp['csrf_token'])
+        case "keyring":
+            import keyring as kr
+            resp = (kr.get_password(path, 'session_id'), kr.get_password(path, 'csrf_token'))
+            return resp
+
 
 
 def setEncryptedData(console: Console, session_id:str, csrf_token: str) -> None:
@@ -74,27 +79,29 @@ def setEncryptedData(console: Console, session_id:str, csrf_token: str) -> None:
     blowfish:ECB-CTS -> storage of data inside a json encoded as bytes, encrypted using blowfish
     """
     console.clear()
-    available = [None, "Blowfish", "wallet", "AES"]
     available_dict = dict(Clear="stored in plain text", 
                                 Blowfish="encrypted with blowfish",
-                                AES="store in an aes encrypted file",
-                                keychain="attempts to use the system wallet [not made, f*** you]"
+                                #AES="store in an aes encrypted file",
+                                keyring="attempts to use the system keyring [not made, f*** you]"
                                 )
     genstr = ""
     for i in range(len(available_dict)) :
         genstr += f'\n\t[bold red]{i+1}.[/] [yellow italic]{list(available_dict.keys())[i]}[/]: {available_dict[list(available_dict.keys())[i]]}'
     console.print(f"here you will be asked how you want to store your auth data{genstr}")
-    ans = Prompt.ask("->", default=list(available_dict).index('Blowfish')+1)
-    match int(ans):
-        case 1: 
+    ans = int(Prompt.ask("->", default=list(available_dict).index('Blowfish')+1))
+    match list(available_dict.keys())[ans-1]:
+        case "Clear": 
             # plain text storage
             with open(os.path.join('cache', 'securestore.json'), 'w') as file:
                 json.dump(dict(style= "None", level= "None", path= str(os.path.join('cache', 'plain.json'))), file)
             with open(os.path.join('cache', 'plain.json'), "w") as file:
                 json.dump(dict(session_id=session_id, csrf_token=csrf_token), file)
             return
-        case 2:
+        case "Blowfish":
             # blowfish storage
+            import blowfish # from [here](https://github.com/jashandeep-sohi/python-blowfish)
+            from cryptography.hazmat.primitives import hashes
+            from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
             console.print(f"[bold #1279e0] l'encryption Blowfish ECB-CTS dérive une clé de 56bit à partir d'un mots de passe")
             p_ok = False
             while p_ok == False:
@@ -123,11 +130,16 @@ def setEncryptedData(console: Console, session_id:str, csrf_token: str) -> None:
             with open(os.path.join('cache', 'blow_ecb_cts.bin'), 'wb') as file:
                 file.write(encr_data)
             return
-        case 3:
+        case "keyring":
             # keyring storage
-            console.print('[bold red]not yet implemented')
-            exit()
-        case 4:
+            console.print("[blue] using the system keyring, you might e prompted to open/create/authorize")
+            import keyring as kr
+            path = "igdm_terminal_securestore"
+            kr.set_password(path, "session_id", session_id)
+            kr.set_password(path, "csrf_token", csrf_token)
+            with open(os.path.join('cache', 'securestore.json'), 'w') as file:
+                json.dump(dict(style='keyring', level='', path=path), file)
+        case "AES": # dropped for now
             #aes storage
             # TODO : prompt for level [128, 256, 512]
             # TODO : handle key derivation, handle different encryption level
@@ -135,6 +147,24 @@ def setEncryptedData(console: Console, session_id:str, csrf_token: str) -> None:
             exit()
 
 def delete_sessions():
+    """
+    this function handle deleting of all files associated with auth
+
+    handles:
+    main securestore.json
+    clear text storage
+    blowfish storage
+    AES storage (even tho it's not implemented)
+    removal from keyring
+    """
+    if os.path.isfile(os.path.join('cache', 'securestore.json')) :
+        with open(os.path.join('cache', 'securestore.json'), 'r') as file:
+            dat = json.load(file)
+        if dat['style'] == "keyring" :
+            import keyring as kr
+            kr.delete_password(dat['path'], "session_id")
+            kr.delete_password(dat['path'], "csrf_token")
+    
     filelist = ['securestore.json', 'clear.json', 'salt.bin', 'blowfish_ecb_cts.bin', 'aes.bin']
     for i in filelist :
         if os.path.isfile(os.path.join('cache', i)): os.remove(os.path.join('cache', i)) 
