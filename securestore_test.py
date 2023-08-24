@@ -1,3 +1,6 @@
+"""
+alr well this file can be ignored cuz it was only used to test the storage function, will be deleted once done
+"""
 import securestore
 from rich.console import Console
 from format_data import format_thread_selection

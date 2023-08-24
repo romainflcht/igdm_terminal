@@ -48,7 +48,8 @@ def openEncryptedData(console: Console) -> tuple:
                     passwd = Prompt.ask("veuillez entrer le mots de passe [bold red]Blowfish[/]"
                                         '(La saisie ne sera pas affiché)', password=True)
                     # deriving key from password
-                    SALT = str.encode(j["optional"]["salt"][2:-1])
+                    with open(os.path.join('cache', 'salt.bin'), 'rb') as file:
+                        SALT = file.read()
                     print(type(SALT), SALT)
                     kdf = PBKDF2HMAC(
                         algorithm=hashes.SHA512(),
@@ -74,8 +75,8 @@ def setEncryptedData(console: Console, session_id:str, csrf_token: str) -> None:
     blowfish:ECB-CTS -> storage of data inside a json encoded as bytes, encrypted using blowfish
     """
     console.clear()
-    available = [None, "Blowfish", "wallet"]
-    console.print("""here you will be asked how you want to store your auth data\n\t[bold red]1.[/][yellow]None -> stored in plain text[/]\n\t[bold red]2.[/]Blowfish -> encrypted with blowfish[WIP]\n\t[bold red]3.[/]system-keyring -> attempts to use the system wallet [not made, f*** you]""")
+    available = [None, "Blowfish", "wallet", "AES"]
+    console.print("""here you will be asked how you want to store your auth data\n\t[bold red]1.[/]None -> stored in plain text[/]\n\t[bold red]2.[yellow italic]Blowfish -> encrypted with blowfish[/]\n\t[bold red]3.[/]system-keyring -> attempts to use the system wallet [not made, f*** you]\n\t[bold red]4.[/]AES -> store in an aes encrypted file""")
     ans = Prompt.ask(", ".join(str(i+1) for i in range(len(available))), default='2')
     match int(ans):
         case 1: 
@@ -111,10 +112,19 @@ def setEncryptedData(console: Console, session_id:str, csrf_token: str) -> None:
             clear_str = json.dumps(dict(session_id=session_id, csrf_token=csrf_token))
             encr_data = b''.join(cipher.encrypt_ecb_cts(str.encode(clear_str, encoding='UTF-8')))
             with open(os.path.join('cache', 'securestore.json'), 'w') as file:
-                json.dump(dict(style='blowfish', level='ECB-CTS', path=str(os.path.join('cache', 'blow_ecb_cts.bin')), optional=dict(salt=f'{SALT}')), file)
+                json.dump(dict(style='blowfish', level='ECB-CTS', path=str(os.path.join('cache', 'blow_ecb_cts.bin'))), file)
+            with open(os.path.join('cache', 'salt.bin'), 'wb') as file:
+                file.write(SALT)
             with open(os.path.join('cache', 'blow_ecb_cts.bin'), 'wb') as file:
                 file.write(encr_data)
             return
         case 3:
+            # keyring storage
+            console.print('[bold red]not yet implemented')
+            exit()
+        case 4:
+            #aes storage
+            # TODO : prompt for level [128, 256, 512]
+            # TODO : handle key derivation, handle different encryption level
             console.print('[bold red]not yet implemented')
             exit()
