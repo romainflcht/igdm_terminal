@@ -20,12 +20,12 @@ UPDATE: it's said "tomorrow", blowfish is done, thx earlier me for leaving a TO 
 def openEncryptedData(console: Console) -> tuple:
     """
     function to return the actual stored data, automatically prompt for required information from user
-    data about the status is stored inside a json file of this structure at path `cache/encr.json`
+    data about the status is stored inside a json file of this structure at path `cache/securestore.json`
     {
         "path": "full path to stored data"
-        "style": "None|aes(WIP)|blowfish|system_wallet(WIP)"
-        "level": "None:None|aes:[128, 256](WIP)|blowfish:ECB-CTS|system_wallet:(WIP)"
-        "optional": [dependant on encryption used, usually salt data and such]
+        "style": "Clear|aes(DROPPED)|blowfish|keyring"
+        "level": "Clear:None|aes:[128, 256](DROPPED)|blowfish:ECB-CTS|keyring:None"
+        "optional": [dependant on encryption used, usually salt data and such] # unused for now
     }
     """
     encrpth = os.path.join('cache', 'securestore.json')
@@ -75,14 +75,15 @@ def setEncryptedData(console: Console, session_id:str, csrf_token: str) -> None:
     """
     function to prompt for encryption to use for storage of both session_id and csrf_token
     available now:
-    None:None -> clear text storage inside json file
+    Clear:None -> clear text storage inside json file
     blowfish:ECB-CTS -> storage of data inside a json encoded as bytes, encrypted using blowfish
+    keyring:None -> uses the system's keyring
     """
     console.clear()
     available_dict = dict(Clear="stored in plain text", 
                                 Blowfish="encrypted with blowfish",
                                 #AES="store in an aes encrypted file",
-                                keyring="attempts to use the system keyring [not made, f*** you]"
+                                keyring="stored inside the system keyring"
                                 )
     genstr = ""
     for i in range(len(available_dict)) :
