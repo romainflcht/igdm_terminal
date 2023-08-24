@@ -14,8 +14,9 @@ attempting to understand it might push you to sewerslide ideas, or consuming hig
 -------
 UPDATE: it is now 1:17am, i'm getting somewhere but the salt is being bitchy, might save it to it's own file to avoid confusion
 eh, fuck it, lemme add a todo for tomorrow (well not tomorrow since it'll be the same day but you get it)
-TODO : save the salt as it's own file instead of saving inside the json, see lines [51] and [114]
 
+-------
+UPDATE: it's said "tomorrow", blowfish is done, thx earlier me for leaving a TO DO
 """
 
 
@@ -50,7 +51,6 @@ def openEncryptedData(console: Console) -> tuple:
                     # deriving key from password
                     with open(os.path.join('cache', 'salt.bin'), 'rb') as file:
                         SALT = file.read()
-                    print(type(SALT), SALT)
                     kdf = PBKDF2HMAC(
                         algorithm=hashes.SHA512(),
                         salt=SALT,
@@ -62,7 +62,6 @@ def openEncryptedData(console: Console) -> tuple:
                     with open(path, 'rb') as file:
                         encr_data = file.read()
                     decrypted_bytes = b''.join(cipher.decrypt_ecb_cts(encr_data))
-                    print(key)
                     resp = json.loads(decrypted_bytes.decode(encoding='UTF-8'))
                     return (resp['session_id'], resp['csrf_token'])
 
@@ -76,8 +75,16 @@ def setEncryptedData(console: Console, session_id:str, csrf_token: str) -> None:
     """
     console.clear()
     available = [None, "Blowfish", "wallet", "AES"]
-    console.print("""here you will be asked how you want to store your auth data\n\t[bold red]1.[/]None -> stored in plain text[/]\n\t[bold red]2.[yellow italic]Blowfish -> encrypted with blowfish[/]\n\t[bold red]3.[/]system-keyring -> attempts to use the system wallet [not made, f*** you]\n\t[bold red]4.[/]AES -> store in an aes encrypted file""")
-    ans = Prompt.ask(", ".join(str(i+1) for i in range(len(available))), default='2')
+    available_dict = dict(Clear="stored in plain text", 
+                                Blowfish="encrypted with blowfish",
+                                AES="store in an aes encrypted file",
+                                keychain="attempts to use the system wallet [not made, f*** you]"
+                                )
+    genstr = ""
+    for i in range(len(available_dict)) :
+        genstr += f'\n\t[bold red]{i+1}.[/] [yellow italic]{list(available_dict.keys())[i]}[/]: {available_dict[list(available_dict.keys())[i]]}'
+    console.print(f"here you will be asked how you want to store your auth data{genstr}")
+    ans = Prompt.ask("->", default=list(available_dict).index('Blowfish')+1)
     match int(ans):
         case 1: 
             # plain text storage
@@ -106,8 +113,6 @@ def setEncryptedData(console: Console, session_id:str, csrf_token: str) -> None:
                 iterations=480000,
             )
             key = kdf.derive(str.encode(passwd))
-            print(SALT)
-            print(key)
             cipher = blowfish.Cipher(key)
             clear_str = json.dumps(dict(session_id=session_id, csrf_token=csrf_token))
             encr_data = b''.join(cipher.encrypt_ecb_cts(str.encode(clear_str, encoding='UTF-8')))
@@ -128,3 +133,8 @@ def setEncryptedData(console: Console, session_id:str, csrf_token: str) -> None:
             # TODO : handle key derivation, handle different encryption level
             console.print('[bold red]not yet implemented')
             exit()
+
+def delete_sessions():
+    filelist = ['securestore.json', 'clear.json', 'salt.bin', 'blowfish_ecb_cts.bin', 'aes.bin']
+    for i in filelist :
+        if os.path.isfile(os.path.join('cache', i)): os.remove(os.path.join('cache', i)) 
