@@ -39,8 +39,10 @@ Once you have those, you can run the `main.py` file and enter your login informa
   <i>Login successful !</i>
 </p>
 
-⚠️ Be careful! The login information is currently saved in plain text inside a text file. I will soon release a 
-cryptographic encryption/decryption feature to protect them.
+your login information can be saved as either: 
+ - *Clear text* (not recommended)
+ - *blowfish* encrypted file, requires that you type a password at startup (recommended for use on linux with no DE)
+ - *keyring* uses your system's keyring to store info (requires a keyring, recommended for windows, mac and linux with a DE)
 
 ## Enjoy :)
 Here is some screenshots of the program running : 

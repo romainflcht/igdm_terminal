@@ -1,5 +1,6 @@
 from rich.prompt import Prompt, Confirm
 from rich.console import Console
+from securestore import openEncryptedData, setEncryptedData, delete_sessions
 import requests
 import os
 
@@ -13,13 +14,8 @@ def login(console: Console, headers: dict) -> tuple:
     """
 
     # Check if a session_id and csrf_token are already saved and valid.
-    if os.path.isfile(os.path.join('cache', 'session_id')) and os.path.isfile(os.path.join('cache', 'csrf_token')):
-        with open(os.path.join('cache', 'session_id'), 'r') as file:
-            session_id = file.read()
-
-        with open(os.path.join('cache', 'csrf_token'), 'r') as file:
-            csrf_token = file.read()
-
+    if os.path.isfile(os.path.join('cache', 'securestore.json')):
+        session_id, csrf_token = openEncryptedData(console)
     else:
         session_id = ''
         csrf_token = ''
@@ -35,12 +31,7 @@ def login(console: Console, headers: dict) -> tuple:
             console.print('[bold red]Votre session ID ou votre csrftoken ne sont plus valide, veuillez les modifier[/]')
 
             # Delete the old session_id.
-            with open(os.path.join('cache', 'session_id'), 'w') as file:
-                file.write('')
-
-            with open(os.path.join('cache', 'csrf_token'), 'w') as file:
-                file.write('')
-
+            delete_sessions()
         while True:
             # While the user hasn't input a correct session_id, keep asking.
             try:
@@ -95,21 +86,7 @@ def save_session(console: Console, session_id: str, csrf_token: str) -> None:
 
     # Check if the user wnat to save it.
     if Confirm(console=console).ask('Voulez-vous savegarder vos informations de connexion pour plus tard ?'):
-        try:
-            # Write it into text files.
-            with open(os.path.join('cache', 'session_id'), 'w') as session_file:
-                session_file.write(session_id)
-
-            with open(os.path.join('cache', 'csrf_token'), 'w') as csrf_token_file:
-                csrf_token_file.write(csrf_token)
-
-            console.print('[bold #2cb00b]Votre session a été sauvegardé pour les prochaines fois ![/]')
-            return
-
-        except FileNotFoundError:
-            # No file were found.
-            console.print('[bold red]Impossible d\'enregistrer votre session, fichiers manquants[/]')
-            return
+        setEncryptedData(console, session_id, csrf_token)
 
     else:
         # File not saved.
