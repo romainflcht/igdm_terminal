@@ -31,7 +31,12 @@ if __name__ == '__main__':
     inbox.show()
 
     # Ask the user the conversation that he want to see.
-    thread_id = format_thread_selection(CONSOLE, CONV_INBOX_NB)
+    try: 
+      thread_id = format_thread_selection(CONSOLE, CONV_INBOX_NB)
+    
+    except KeyboardInterrupt:
+      CONSOLE.print('\n[bold green]Au revoir :)\n')
+      exit()
 
     # Fetch items inside the thread.
     selected_thread = inbox.get_thread(thread_id)

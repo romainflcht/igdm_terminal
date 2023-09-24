@@ -1,4 +1,5 @@
 from fetch_data import fetch_username_by_id, fetch_profile_pic_by_id
+from securestore import delete_sessions
 from rich.console import Console
 from rich.prompt import IntPrompt
 from PIL import Image
@@ -229,7 +230,13 @@ def format_thread_selection(console: Console, max_thead_nb: int) -> int:
 
     while not is_valid_thread_id:
         # Ask the conversation number.
+        console.print('[italic grey50]Entrer [bold]0[/bold] pour se déconnecter ou [bold]CRTL+C[/bold] pour quitter le programme.[/]')
         thread_id = IntPrompt.ask(f'Selectionnez la conversation : (1-{max_thead_nb})')
+
+        if thread_id == 0:
+            delete_sessions()
+            console.print('\n[bold green]Vous avez été déconnecté, au revoir :)\n')
+            exit()
 
         # Check if the number is valid.
         if 0 < thread_id <= max_thead_nb:
