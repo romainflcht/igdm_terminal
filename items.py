@@ -10,6 +10,8 @@ class Text:
         """
         Constructor of the Text class.
         :param session: Session that contain cookies and headers.
+        :param console: Console object that contain every info on the current console.
+        :param issentbyviewer: Boolean that is true if the item is sent by the user, false otherwise. 
         :param sender_id: Instagram ID of the user that send this item.
         :param timestamp: Timestamp of this item.
         :param text: Text of this item.
@@ -24,16 +26,20 @@ class Text:
         self._reactions = reactions
 
     def show(self):
+        # Fetch every data needed.
         username = fetch_username_by_id(self._session, str(self._sender_id))
         profile_pic = fetch_profile_pic_by_id(self._session, str(self._sender_id))
         reactions = format_reaction(self._session, self._reactions)
 
+        # Check if the item is sent by the owner of the account. 
         if self._issentbyviewer:
+            # display the item. 
             self._console.print(f'{profile_pic} ({format_timestamp(self._timestamp)}) {username}\n'
                                 f'{self._text}'
                                 f'{reactions}\n', soft_wrap=True)
 
         else:
+            # display the item. 
             self._console.print(f'{username} ({format_timestamp(self._timestamp)}) {profile_pic}\n'
                                 f'{self._text}'
                                 f'{reactions}\n', soft_wrap=True, justify='right')
@@ -52,6 +58,8 @@ class Link:
         """
         Constructor of the Link class.
         :param session: Session that contain cookies and headers.
+        :param console: Console object that contain every info on the current console.
+        :param issentbyviewer: Boolean that is true if the item is sent by the user, false otherwise. 
         :param sender_id: Instagram ID of the user that send this item.
         :param timestamp: Timestamp of this item.
         :param text: Text of this item.
@@ -66,17 +74,21 @@ class Link:
         self._reactions = reactions
 
     def show(self):
+        # Fetch every data needed. 
         username = fetch_username_by_id(self._session, str(self._sender_id))
         profile_pic = fetch_profile_pic_by_id(self._session, str(self._sender_id))
         text = format_link(self._text)
         reactions = format_reaction(self._session, self._reactions)
 
+        # Check if the item is sent by the owner of the account. 
         if self._issentbyviewer:
+            # display the item. 
             self._console.print(f'{profile_pic} ({format_timestamp(self._timestamp)}) {username}\n'
                                 f'{text}'
                                 f'{reactions}\n', soft_wrap=True)
 
         else:
+            # display the item. 
             self._console.print(f'{username} ({format_timestamp(self._timestamp)}) {profile_pic}\n'
                                 f'{text}'
                                 f'{reactions}\n', soft_wrap=True, justify='right')
@@ -95,6 +107,8 @@ class Clip:
         """
         Constructor of the Clip class.
         :param session: Session that contain cookies and headers.
+        :param console: Console object that contain every info on the current console.
+        :param issentbyviewer: Boolean that is true if the item is sent by the user, false otherwise. 
         :param sender_id: Instagram ID of the user that send this item.
         :param timestamp: Timestamp of this item.
         :param src: URL of the clip.
@@ -146,6 +160,8 @@ class MediaShare:
         """
         Constructor of the Clip class.
         :param session: Session that contain cookies and headers.
+        :param console: Console object that contain every info on the current console.
+        :param issentbyviewer: Boolean that is true if the item is sent by the user, false otherwise. 
         :param sender_id: Instagram ID of the user that send this item.
         :param timestamp: Timestamp of this item.
         :param post_img: Image that the post contain.
@@ -192,6 +208,8 @@ class VoiceMedia:
         """
         Constructor of the Clip class.
         :param session: Session that contain cookies and headers.
+        :param console: Console object that contain every info on the current console.
+        :param issentbyviewer: Boolean that is true if the item is sent by the user, false otherwise. 
         :param sender_id: Instagram ID of the user that send this item.
         :param timestamp: Timestamp of this item.
         :param audio_src: Url of the audio.
@@ -236,6 +254,9 @@ class RavenMedia:
         """
         Constructor of the RavenMedia class.
         :param session: Session that contain cookies and headers.
+        :param console: Console object that contain every info on the current console.
+        :param issentbyviewer: Boolean that is true if the item is sent by the user, false otherwise. 
+        :param session: Session that contain cookies and headers.
         :param sender_id: Instagram ID of the user that send this item.
         :param timestamp: Timestamp of this item.
         :param media_type: If the media is video or photo.
@@ -276,6 +297,9 @@ class Media:
                  timestamp: int, media_type: str, src: str, reactions: dict):
         """
         Constructor of the RavenMedia class.
+        :param session: Session that contain cookies and headers.
+        :param console: Console object that contain every info on the current console.
+        :param issentbyviewer: Boolean that is true if the item is sent by the user, false otherwise. 
         :param sender_id: Instagram ID of the user that send this item.
         :param timestamp: Timestamp of this item.
         :param media_type: If the media is video or photo.
@@ -321,6 +345,9 @@ class StoryShare:
                  timestamp: int, first_frame: str, url: str, reactions: dict):
         """
         Constructor of the StoryShare class.
+        :param session: Session that contain cookies and headers.
+        :param console: Console object that contain every info on the current console.
+        :param issentbyviewer: Boolean that is true if the item is sent by the user, false otherwise. 
         :param sender_id: Instagram ID of the user that send this item.
         :param timestamp: Timestamp of this item.
         :param first_frame: First frame of the story (image if the story is an image).
@@ -340,18 +367,26 @@ class StoryShare:
         username = fetch_username_by_id(self._session, str(self._sender_id))
         profile_pic = fetch_profile_pic_by_id(self._session, str(self._sender_id))
         reactions = format_reaction(self._session, self._reactions)
-        first_frame = fetch_img_from_url(self._session, self._console, self._first_frame)
+        
+        # set the text to display as unavailable and check after. 
+        display_text = '[red italic]Cette story n\'est plus disponible...\n[/]'
+
+        # Check if the story is available. 
+        if self._first_frame is not None and self._url is not None:
+            first_frame = fetch_img_from_url(self._session, self._console, self._first_frame)
+            display_text = f'[link={self._url}]{first_frame}[/]'
+
 
         if self._issentbyviewer:
             self._console.print(f'{profile_pic} ({format_timestamp(self._timestamp)}) {username}\n'
                                 'Vous avez partagé une story.\n'
-                                f'[link={self._url}]{first_frame}[/]'
+                                f'{display_text}'
                                 f'{reactions}\n', soft_wrap=True)
 
         else:
             self._console.print(f'{username} ({format_timestamp(self._timestamp)}) {profile_pic}\n'
                                 'A partagé une story.\n'
-                                f'[link={self._url}]{first_frame}[/]'
+                                f'{display_text}'
                                 f'{reactions}\n', soft_wrap=True, justify='right')
 
     def get_timestamp(self):
@@ -366,7 +401,10 @@ class ReelShare:
     def __init__(self, session: requests.Session, console: Console, issentbyviewer: bool, sender_id: int,
                  timestamp: int, first_frame: str, text: str, url: str, story_owner_id: str, reactions: dict):
         """
-        Constructor of the StoryShare class.
+        Constructor of the ReelShare class.
+        :param session: Session that contain cookies and headers.
+        :param console: Console object that contain every info on the current console.
+        :param issentbyviewer: Boolean that is true if the item is sent by the user, false otherwise. 
         :param sender_id: Instagram ID of the user that send this item.
         :param timestamp: Timestamp of this item.
         :param first_frame: First frame of the story (image if the story is an image).
@@ -391,20 +429,67 @@ class ReelShare:
         reactions = format_reaction(self._session, self._reactions)
         first_frame = fetch_img_from_url(self._session, self._console, self._first_frame)
 
+        # set the text to display as unavailable and check after. 
+        display_text = '[red italic]Cette story n\'est plus disponible...\n[/]'
+
+        # Check if the story is available. 
+        if self._first_frame is not None and self._url is not None:
+            first_frame = fetch_img_from_url(self._session, self._console, self._first_frame)
+            display_text = f'[link={self._url}]{first_frame}[/]'
+
         if self._issentbyviewer:
             story_owner = fetch_username_by_id(self._session, str(self._story_owner_id))
             self._console.print(f'{profile_pic} ({format_timestamp(self._timestamp)}) {username}\n'
                                 f'Vous avez réagi a la story de {story_owner}.\n'
-                                f'[link={self._url}]{first_frame}[/]'
+                                f'{display_text}'
                                 f'{self._text}'
                                 f'{reactions}\n', soft_wrap=True)
 
         else:
             self._console.print(f'{username} ({format_timestamp(self._timestamp)}) {profile_pic}\n'
                                 f'A réagi a votre story.\n'
-                                f'[link={self._url}]{first_frame}[/]'
+                                f'{display_text}'
                                 f'{self._text}'
                                 f'{reactions}\n', soft_wrap=True, justify='right')
+
+    def get_timestamp(self):
+        """
+        Function that return the timestamp of the item. Useful to sort items of a thread in the right order.
+        :return: Timestamp of the item.
+        """
+        return self._timestamp
+    
+
+class Placeholder:
+    def __init__(self, session: requests.Session, console: Console, issentbyviewer: bool, sender_id: int,
+                 timestamp: int, message: str):
+        """
+        Constructor of the Placeholder class.
+        :param session: Session that contain cookies and headers.
+        :param console: Console object that contain every info on the current console.
+        :param sender_id: Instagram ID of the user that send this item.
+        :param timestamp: Timestamp of this item.
+        :param message: The message inside the placeholder.
+        """
+        self._session = session
+        self._console = console
+        self._issentbyviewer = issentbyviewer
+        self._sender_id = sender_id
+        self._timestamp = timestamp
+        self._message = message
+
+    def show(self):
+        username = fetch_username_by_id(self._session, str(self._sender_id))
+        profile_pic = fetch_profile_pic_by_id(self._session, str(self._sender_id))
+
+        # Display the placeholder message. 
+        if self._issentbyviewer:
+            self._console.print(f'{profile_pic} ({format_timestamp(self._timestamp)}) {username}\n'
+                                f'[red italic]{self._message}[/]\n', soft_wrap=True)
+
+        else:
+            self._console.print(f'{username} ({format_timestamp(self._timestamp)}) {profile_pic}\n'
+                                f'[red italic]{self._message}[/]\n', soft_wrap=True, justify='right')
 
     def get_timestamp(self):
         """

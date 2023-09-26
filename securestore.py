@@ -1,5 +1,5 @@
 import os, json
-from rich.prompt import Prompt, Confirm
+from rich.prompt import Prompt
 from rich.console import Console
 
 """
@@ -103,14 +103,14 @@ def setEncryptedData(console: Console, session_id:str, csrf_token: str) -> None:
             import blowfish # from [here](https://github.com/jashandeep-sohi/python-blowfish)
             from cryptography.hazmat.primitives import hashes
             from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-            console.print(f"[bold #1279e0] l'encryption Blowfish ECB-CTS dérive une clé de 56bit à partir d'un mot de passe")
+            console.print(f"[bold #1279e0]L'encryption Blowfish ECB-CTS dérive une clé de 56bit à partir d'un mot de passe")
             p_ok = False
             while p_ok == False:
-                passwd = Prompt.ask("veuillez entrer le mots de passe [bold red]Blowfish[/] "
+                passwd = Prompt.ask("Veuillez entrer le mots de passe [bold red]Blowfish[/] "
                                     '(La saisie ne sera pas affiché)', password=True)
-                passwd2 = Prompt.ask("veuillez entrer à nouveau le mots de passe [bold red]Blowfish[/] "
+                passwd2 = Prompt.ask("Veuillez entrer à nouveau le mots de passe [bold red]Blowfish[/] "
                                     '(La saisie ne sera pas affiché)', password=True)
-                if passwd != passwd2: console.print("[bold red] le mots de passe n'est pas identique, veuillez réessayer")
+                if passwd != passwd2: console.print("[bold red]Le mots de passe n'est pas identique, veuillez réessayer")
                 else: p_ok = True
             SALT = os.urandom(16)
             # deriving key from password
@@ -133,7 +133,7 @@ def setEncryptedData(console: Console, session_id:str, csrf_token: str) -> None:
             return
         case "keyring":
             # keyring storage
-            console.print("[blue] using the system keyring, you might be prompted to open/create/authorize")
+            console.print("[blue]Using the system keyring, you might be prompted to open/create/authorize")
             import keyring as kr
             path = "igdm_terminal_securestore"
             kr.set_password(path, "session_id", session_id)
@@ -166,6 +166,6 @@ def delete_sessions():
             kr.delete_password(dat['path'], "session_id")
             kr.delete_password(dat['path'], "csrf_token")
     
-    filelist = ['securestore.json', 'clear.json', 'salt.bin', 'blowfish_ecb_cts.bin', 'aes.bin']
+    filelist = ['securestore.json', 'plain.json', 'salt.bin', 'blow_ecb_cts.bin', 'aes.bin']
     for i in filelist :
         if os.path.isfile(os.path.join('cache', i)): os.remove(os.path.join('cache', i)) 

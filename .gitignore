@@ -1,6 +1,19 @@
+##################   FILES   ##################
+.gitignore
+TODO.txt
+
+
+################## DIRECTORY ##################
 /venv
 /venv/**
 /cache
 /cache/**
 /__pycache__
 /__pycache__/**
+/.idea
+/.idea/**
+
+/fetched_json
+/fetched_json/**
+/tests
+/tests/**

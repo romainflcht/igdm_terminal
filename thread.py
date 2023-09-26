@@ -16,7 +16,7 @@ class Thread:
         Constructor of the Thread class.
         :param session: Session that contain cookies and headers.
         :param console: Console object that contain every info on the current console.
-        :param thread_id: thread id to fetch items.
+        :param thread_id: Thread id to fetch items.
         :param thread_title: Name of the group or thread.
         :param users: Users in the group or thread.
         :param last_item_sent: Last item that is print below the username in the inbox.
@@ -41,6 +41,10 @@ class Thread:
         Method that update the thread by fetching every item sent in the thread.
         :param nb_items: Number of items to get.
         """
+
+        # Delete previous items in the thread. 
+        self._items = []
+
         with self._console.status(status='[bold]Fetching direct messages from Instagram Inc.[/bold]',
                                   spinner='dots', spinner_style='white'):
 
@@ -53,7 +57,7 @@ class Thread:
 
             # For every item in the thread create an object of the item type.
             for item in response['thread']['items']:
-                if item['item_type'] == 'text':
+                if item.get('item_type') == 'text':
                     # Item is a text.
                     self._items.append(items.Text(self._session,
                                                   self._console,
@@ -63,8 +67,8 @@ class Thread:
                                                   item['text'],
                                                   item.get('reactions')))
 
-                elif item['item_type'] == 'link':
-                    # Item is a text.
+                elif item.get('item_type') == 'link':
+                    # Item is a link.
                     self._items.append(items.Link(self._session,
                                                   self._console,
                                                   item['is_sent_by_viewer'],
@@ -88,8 +92,8 @@ class Thread:
                                                   item.get('reactions')))
 
                 elif item.get('item_type') == 'media_share':
-                    # Item is a post.
-
+                    # Item is a post (one item post or multiple items post).
+                    
                     # Get the image id that was sent (to show the correct image of the post).
                     img_id = item['media_share'].get('carousel_share_child_media_id')
                     if img_id is None:
@@ -97,7 +101,7 @@ class Thread:
                         post_img = get_smallest_img(item['media_share']['image_versions2']['candidates'])
                     else:
 
-                        # Looking for the coorect image attached to the id.
+                        # Looking for the correct image attached to the id.
                         for img in item['media_share']['carousel_media']:
                             if img['id'] == img_id:
                                 # If the ids match, fetch it.
@@ -118,6 +122,7 @@ class Thread:
                                                         item['media_share']['code'],
                                                         item['media_share']['caption']['text'],
                                                         item.get('reactions')))
+
 
                 elif item.get('item_type') == 'voice_media':
                     # Item is a voice message.
@@ -154,11 +159,19 @@ class Thread:
 
                 elif item.get('item_type') == 'story_share':
                     # Item is a story share.
-                    first_frame = get_smallest_img(item['story_share']['media']['image_versions2']['candidates'])
-                    url = first_frame
 
-                    if item['story_share']['media']['media_type'] != 1:
-                        url = item['story_share']['media']['video_versions'][0]['url']
+                    # Set the story as unavailable before check. 
+                    first_frame = None
+                    url = None
+
+                    # Check if the story is available and set first_frame and url accordingly.  
+                    if item['story_share'].get('media') is not None:
+                        # Story is available, define the first frame.
+                        first_frame = get_smallest_img(item['story_share']['media']['image_versions2']['candidates'])
+                        url = first_frame
+
+                        if item['story_share']['media']['media_type'] != 1:
+                            url = item['story_share']['media']['video_versions'][0]['url']
 
                     self._items.append(items.StoryShare(self._session,
                                                         self._console,
@@ -171,11 +184,17 @@ class Thread:
 
                 elif item.get('item_type') == 'reel_share':
                     # Item is a story share.
-                    first_frame = get_smallest_img(item['reel_share']['media']['image_versions2']['candidates'])
-                    url = first_frame
 
-                    if item['reel_share']['media']['media_type'] != 1:
-                        url = item['reel_share']['media']['video_versions'][0]['url']
+                    first_frame = None
+                    url = None
+
+                    # Check if the story is available and set first_frame and url accordingly.  
+                    if item['reel_share'].get('media') is not None:
+                        first_frame = get_smallest_img(item['reel_share']['media']['image_versions2']['candidates'])
+                        url = first_frame
+
+                        if item['reel_share']['media']['media_type'] != 1:
+                            url = item['reel_share']['media']['video_versions'][0]['url']
 
                     self._items.append(items.ReelShare(self._session,
                                                        self._console,
@@ -187,9 +206,20 @@ class Thread:
                                                        url,
                                                        item['reel_share']['reel_owner_id'],
                                                        item.get('reactions')))
+                    
+                elif item.get('item_type') == 'placeholder':
+                    pass
+                    self._items.append(items.Placeholder(self._session, 
+                                                         self._console, 
+                                                         item['is_sent_by_viewer'],
+                                                         item['user_id'],
+                                                         item['timestamp'],
+                                                         item['placeholder']['message']))
 
                 else:
-                    self._console.print(f'[bold red]Item type {item["item_type"]} not supported...[/]')
+                    # Ignore action_log item because they are not supposed to be displayed.
+                    if not item.get('item_type') == 'action_log':
+                        self._console.print(f'[bold red]Item type {item["item_type"]} not supported...[/]')
 
             # Sort every item by time.
             self._items.sort(key=lambda elt: elt.get_timestamp())
@@ -200,8 +230,8 @@ class Thread:
     def show(self, thread_index: int):
         """
         Function that print the thread on the screen.
-        :param thread_index: Number to display beside the username. Number that is useful to open the thread by
-        choosing this number.
+        :param thread_index: Number to display beside the username. Number that is used to open the thread by
+        choosing this number on the main menu.
         """
         profile_pic = ''
         for user in self._users:
@@ -221,7 +251,18 @@ class Thread:
         self._console.print(Panel(thread))
 
     def get_items(self):
+        """
+        Getter function that return the list of every items of the thread. 
+        :return: The list of every items of the thread. 
+        """
         return self._items
+    
+    def get_thread_id(self):
+        """
+        Getter function that return the id of the thread. 
+        :return: The id of the thread. 
+        """
+        return self._id
 
 if __name__ == '__main__':
     print('This code is intended to be imported...')

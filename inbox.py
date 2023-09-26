@@ -7,27 +7,27 @@ import requests
 class Inbox:
     URL = 'https://i.instagram.com/api/v1/direct_v2/inbox/'
 
-    def __init__(self, console: Console, cookies: dict, headers: dict) -> None:
+    def __init__(self, console: Console, session: requests.Session, debug:bool = False) -> None:
         """
         Constructor of the Inbox class.
-        :param cookies: Cookies that contain session id.
-        :param headers: Headers that contain header info (To not be blocked by Instagram server).
+        :param session: Session that contain cookies and headers.
         """
-        self._cookies = cookies
-        self._headers = headers
-        self._session = requests.Session()
+        self._session = session
         self._console = console
+        self._debug = debug
         self._threads = []
         self._unseencount = 0
 
-        self._session.headers.update(headers)
-        self._session.cookies.update(cookies)
 
     def update_indox(self, nb_threads: int) -> None:
         """
         Method that update the inbox by fetching every thread in the inbox.
         :param nb_threads: Number of threads to get.
         """
+
+        #  Delete previous threads in the inbox. 
+        self._threads = []
+
         with self._console.status(status='[bold]Fetching direct messages from Instagram Inc.[/]',
                                   spinner='dots', spinner_style='#ffffff'):
 
@@ -60,6 +60,8 @@ class Inbox:
 
         for index, thread in enumerate(self._threads):
             # Print thread with the index that is used to open the conversation.
+            if self._debug: 
+                self._console.print(f'({index + 1}) THREAD ID -> {thread._id}')
             thread.show(index + 1)
 
         # Footer :).

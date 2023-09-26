@@ -63,19 +63,19 @@ def format_last_item(session: requests.Session, item: dict) -> tuple:
     """
 
     # Check the item type to diplay the correct message.
-    if item['item_type'] == 'text':
+    if item.get('item_type') == 'text':
         # item is text.
         return item['text'], item['timestamp']
 
-    elif item['item_type'] == 'link':
+    elif item.get('item_type') == 'link':
         # item is a text with links.
         return item['link']['text'], item['timestamp']
 
-    elif item['item_type'] == 'action_log':
+    elif item.get('item_type') == 'action_log':
         # Item is reaction.
         return fetch_username_by_id(session, item.get('user_id')) + ' à aimé un message', item['timestamp']
 
-    elif item['item_type'] == 'reel_share':
+    elif item.get('item_type') == 'reel_share':
         # Item is a reaction to a story.
 
         # Get the text of the reply.
@@ -89,41 +89,41 @@ def format_last_item(session: requests.Session, item: dict) -> tuple:
             sender_username = fetch_username_by_id(session, item['user_id'])
             return sender_username + f'a réagis à votre story : {text}', item['timestamp']
 
-    elif item['item_type'] == 'story_share':
+    elif item.get('item_type') == 'story_share':
         # item is a story.
         item_type = 'une story.'
 
-    elif item['item_type'] == 'clip':
+    elif item.get('item_type') == 'clip':
         # item is a reel.
         item_type = 'un réel.'
 
-    elif item['item_type'] == 'media_share':
+    elif item.get('item_type') == 'media_share':
         # item is a post.
         item_type = 'un post.'
 
-    elif item['item_type'] == 'raven_media':
+    elif item.get('item_type') == 'raven_media':
         # item is a one-shot media.
         item_type = 'une ' + ('photo.' if item['raven_media'].get('media_type') else 'vidéo.')
 
-    elif item['item_type'] == 'animated_media':
+    elif item.get('item_type') == 'animated_media':
         # item is a GIF.
         item_type = 'un GIF.'
 
-    elif item['item_type'] == 'media':
+    elif item.get('item_type') == 'media':
         # item is a media.
         item_type = 'une ' + ('photo.' if item['media'].get('media_type') else 'vidéo.')
 
-    elif item['item_type'] == 'voice_media':
+    elif item.get('item_type') == 'voice_media':
         # item is a voice message.
         item_type = 'un message vocal.'
 
-    elif item['item_type'] == 'story_share':
+    elif item.get('item_type') == 'story_share':
         # item is a story.
         item_type = 'une story.'
 
     else:
         # item_type not supported.
-        item_type = 'un élément [bold red]non supporté[/].'
+        item_type = f'un élément [bold red]non supporté ({item.get("item_type")})[/].'
 
     # Change the message depending on which user sent the message.
     if item.get('is_sent_by_viewer'):

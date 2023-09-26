@@ -44,6 +44,14 @@ your login information can be saved as either:
  - *blowfish* encrypted file, requires that you type a password at startup (recommended for use on linux with no DE)
  - *keyring* uses your system's keyring to store info (requires a keyring, recommended for windows, mac and linux with a DE)
 
+## Tweaks
+You can choose how many threads and items are displayed during runtime. To change those values, modify the two lines in the `main.py` file. 
+
+```python
+CONV_INBOX_NB = 20 # Will display 20 conversations in the inbox menu. 
+CONV_ITEMS_NB = 30 # Will display 30 items in the selectec conversation. 
+```
+
 ## Enjoy :)
 Here is some screenshots of the program running : 
 
@@ -59,16 +67,18 @@ Here is some screenshots of the program running :
   <i>Conversations</i>
 </p>
 
-Supported features : 
+(proudly) Supported features : 
 - 📄 Text
 - 🌐 Link
 - 🎬 Clip
 - 🖼️ Media share (images & video)
 - 🔊 Voice media
 - 📷 See Once media
-- 📖 Story share
+- 📖 Story share & reactions
 - 📹 Reel share
+- ⚠️ Placeholder
 - ❤️ Liked messages
+- 📤 Sent direct message
 
 ## Licence
 - romainflcht
