@@ -62,7 +62,7 @@ def get_session_id(console: Console) -> tuple:
     :return:
     """
 
-    console.print('[bold #1279e0 link=https://github.com/romainflcht/igdm_terminal#:~:text=To%20link%20your%20Instagram%20account]Où trouvé mon session ID et mon CSRT Token Instagram Inc. ?[/]')
+    console.print('[bold #1279e0 link=https://github.com/romainflcht/igdm_terminal#:~:text=To%20link%20your%20Instagram%20account]Où trouver mon session ID et mon CSRT Token Instagram Inc. ?[/]')
 
     # Ask the information needed.
     session_id = Prompt.ask('Veuillez entrer votre [bold #e0c112]session ID Instagram Inc. [/]'
