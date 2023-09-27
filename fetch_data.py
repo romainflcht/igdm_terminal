@@ -12,6 +12,7 @@ def fetch_username_by_id(session: requests.session, user_id: str) -> str:
     :param user_id: Instagram User ID.
     :return: The username linked to the user ID.
     """
+
     username = None
     data = {}
 
@@ -23,19 +24,19 @@ def fetch_username_by_id(session: requests.session, user_id: str) -> str:
                 data = json.load(save_file)
 
             # Check if the username is in the cache if not request the username and save it.
-            username = data.get(user_id)
+            username = data.get(str(user_id))
 
         # delete empty cache file if it's empty.
         else: os.remove(os.path.join('cache', 'saved_usernames.json'))
     if username is None:
-        req = session.get('https://i.instagram.com/api/v1/users/' + user_id + '/info/')
+        req = session.get(f'https://i.instagram.com/api/v1/users/{user_id}/info/')
 
         # Check if the request is successful.
         if req.status_code == 200:
 
             # Fetch the username and save it into the cache/saved_usernames.json file.
             username = req.json()['user'].get('username')
-            data[user_id] = username
+            data[str(user_id)] = username
             with open(os.path.join('cache', 'saved_usernames.json'), 'w') as save_file:
                 json.dump(data, save_file)
 
@@ -48,26 +49,28 @@ def fetch_username_by_id(session: requests.session, user_id: str) -> str:
 
 def fetch_profile_pic_by_id(session: requests.Session, user_id: str) -> str:
     """
-        Function that fetch the IG profile picture linked to the ID.
-        :param session: Session that contain cookies and headers.
-        :param user_id: Instagram User ID.
-        :return: The 4 colors of the profile picture.
-        """
+    Function that fetch the IG profile picture linked to the ID.
+    :param session: Session that contain cookies and headers.
+    :param user_id: Instagram User ID.
+    :return: The 4 colors of the profile picture.
+    """
+
     colors = None
     data = {}
 
     if os.path.isfile(os.path.join('cache', 'saved_profile_pic.json')):
-        if os.stat(os.path.join('cache', 'saved_profile_pic.json')).st_size != 0 : # check if cache file isn't empty || verifie que le fichier de cache n'est pas vide
+        if os.stat(os.path.join('cache', 'saved_profile_pic.json')).st_size != 0 : # check if cache file isn't empty
             with open(os.path.join('cache', 'saved_profile_pic.json'), 'r') as save_file:
                 data = json.load(save_file)
 
             # Check if the profile picture is in the cache if not request it and save it.
-            colors = data.get(user_id)
-        else: os.remove(os.path.join('cache', 'saved_profile_pic.json'))# delete empty cache file || efface le fichier de cache vide
+            colors = data.get(str(user_id))
+        else: 
+            os.remove(os.path.join('cache', 'saved_profile_pic.json')) # delete empty cache file
 
     if colors is None:
         colors = []
-        req = session.get('https://i.instagram.com/api/v1/users/' + user_id + '/info/')
+        req = session.get(f'https://i.instagram.com/api/v1/users/{user_id}/info/')
 
         # Check if the request is successful.
         if req.status_code == 200:
@@ -79,6 +82,7 @@ def fetch_profile_pic_by_id(session: requests.Session, user_id: str) -> str:
             # Check if the request is successful.
             if req.status_code == 200:
                 profile_pic = Image.open(req.raw).resize((2, 2))
+                
 
                 for index_width in range(profile_pic.width):
                     for index_height in range(profile_pic.height):
@@ -86,10 +90,14 @@ def fetch_profile_pic_by_id(session: requests.Session, user_id: str) -> str:
                         r, g, b = profile_pic.getpixel((index_width, index_height))
                         colors.append('#{:02x}{:02x}{:02x}'.format(r, g, b))
 
-                data[user_id] = colors
+                data[str(user_id)] = colors
                 with open(os.path.join('cache', 'saved_profile_pic.json'), 'w') as save_file:
                     json.dump(data, save_file)
-
+            
+            else:
+                # The request failed, set every PP to red.
+                colors = ['#ff0000', '#ff0000', '#ff0000', '#ff0000']
+    
     return f'[{colors[0]} on {colors[1]}]▄[/][{colors[2]} on {colors[3]}]▄[/]'
 
 
@@ -103,7 +111,7 @@ def fetch_img_from_url(session: requests.Session, console: Console, url: str) ->
     """
 
     # Fetch raw data of the image.
-    req = session.get(url, stream=True)
+    req = session.get(str(url), stream=True)
 
     # check if the request is successful.
     if req.status_code == 200:

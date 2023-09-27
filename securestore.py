@@ -168,4 +168,9 @@ def delete_sessions():
     
     filelist = ['securestore.json', 'plain.json', 'salt.bin', 'blow_ecb_cts.bin', 'aes.bin']
     for i in filelist :
-        if os.path.isfile(os.path.join('cache', i)): os.remove(os.path.join('cache', i)) 
+        if os.path.isfile(os.path.join('cache', i)): 
+            os.remove(os.path.join('cache', i)) 
+
+
+if __name__ == '__main__':
+    print('This code is intended to be imported...')

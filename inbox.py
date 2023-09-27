@@ -45,7 +45,7 @@ class Inbox:
                     # Create a Thread object and save it.
                     self._threads.append(Thread(self._session,
                                                 self._console,
-                                                thread['thread_id'],
+                                                str(thread['thread_id']),
                                                 thread['thread_title'],
                                                 thread['users'],
                                                 format_last_item(self._session, thread['items'][0]),

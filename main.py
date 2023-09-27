@@ -4,9 +4,10 @@ from format_data import format_thread_selection
 from send_direct_msg import send_message
 from inbox import Inbox
 from login import login
-from HEADERS import HEADERS
+from headers_generation import generate_request_header
 
 # Create the request session that will be used for every component. 
+HEADERS = generate_request_header()
 SESSION = requests.session()
 SESSION.headers.update(HEADERS)
 
@@ -16,7 +17,6 @@ CONSOLE = Console()
 # Change those numbers how you want. 
 CONV_INBOX_NB = 15
 CONV_ITEMS_NB = 20
-
 
 
 if __name__ == '__main__':
@@ -30,12 +30,11 @@ if __name__ == '__main__':
         'sessionid': session_id,
     }
 
-
     # Create an unique session for every future requests. 
     SESSION.cookies.update(cookies)
 
     # Create inbox object.
-    inbox = Inbox(SESSION, CONSOLE, True)
+    inbox = Inbox(SESSION, CONSOLE)
 
     while 1: 
         # Fetch inbox datas. 

@@ -250,7 +250,7 @@ class VoiceMedia:
 
 class RavenMedia:
     def __init__(self, session: requests.Session, console: Console, issentbyviewer: bool, sender_id: int,
-                 timestamp: int, media_type: str, reactions: dict):
+                 seen_count: int, timestamp: int, media_type: str, reactions: dict):
         """
         Constructor of the RavenMedia class.
         :param session: Session that contain cookies and headers.
@@ -266,6 +266,7 @@ class RavenMedia:
         self._console = console
         self._issentbyviewer = issentbyviewer
         self._sender_id = sender_id
+        self._seen_count = seen_count
         self._timestamp = timestamp
         self._media_type = media_type
         self._reactions = reactions
@@ -275,14 +276,18 @@ class RavenMedia:
         profile_pic = fetch_profile_pic_by_id(self._session, str(self._sender_id))
         reactions = format_reaction(self._session, self._reactions)
 
+        seen_text = '[dark_orange](ouvert)[/]' if self._seen_count > 0 else '[blue](à ouvrir)[/]'
+
+
         if self._issentbyviewer:
-            self._console.print(f'{profile_pic} ({format_timestamp(self._timestamp)}) {username}\nVous avez envoyé une '
-                                + ('photo.' if self._media_type == 1 else 'vidéo.') + f'{reactions}\n', soft_wrap=True)
+            self._console.print(f'{profile_pic} ({format_timestamp(self._timestamp)}) {username}\n' + 
+                                f'{seen_text} Vous avez envoyé une ' + ('photo.' if self._media_type == 1 else 'vidéo.') +                            
+                                f'{reactions}\n', soft_wrap=True)
 
         else:
-            self._console.print(f'{username} ({format_timestamp(self._timestamp)}) {profile_pic}\n{username} a envoyé '
-                                f'une ' + ('photo.' if self._media_type == 1 else 'vidéo.') + f'{reactions}\n',
-                                soft_wrap=True, justify='right')
+            self._console.print(f'{username} ({format_timestamp(self._timestamp)}) {profile_pic}\n' + 
+                                f'{seen_text} {username} a envoyé une ' + ('photo.' if self._media_type == 1 else 'vidéo.') + 
+                                f'{reactions}\n', soft_wrap=True, justify='right')
 
     def get_timestamp(self):
         """

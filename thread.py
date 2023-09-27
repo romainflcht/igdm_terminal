@@ -130,11 +130,11 @@ class Thread:
                     # Item is a voice message.
                     self._items.append(items.VoiceMedia(self._session,
                                                         self._console,
-                                                        item['is_sent_by_viewer'],
-                                                        item['user_id'],
-                                                        item['timestamp'],
-                                                        item['voice_media']['media']['audio']['audio_src'],
-                                                        item['voice_media']['media']['audio']['duration'],
+                                                        item.get('is_sent_by_viewer'),
+                                                        item.get('user_id'),
+                                                        item.get('timestamp'),
+                                                        item['voice_media']['media']['audio'].get('audio_src'),
+                                                        item['voice_media']['media']['audio'].get('duration'),
                                                         item.get('reactions')))
 
                 elif item.get('item_type') == 'raven_media':
@@ -143,8 +143,9 @@ class Thread:
                                                         self._console,
                                                         item.get('is_sent_by_viewer'),
                                                         item.get('user_id'),
+                                                        item['visual_media'].get('seen_count'), 
                                                         item.get('timestamp'),
-                                                        item['raven_media'].get('media_type'),
+                                                        item['visual_media']['media'].get('media_type'),
                                                         item.get('reactions')))
 
                 elif item.get('item_type') == 'media':
