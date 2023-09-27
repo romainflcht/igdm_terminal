@@ -11,7 +11,7 @@ class Thread:
     URL = 'https://i.instagram.com/api/v1/direct_v2/threads/'
 
     def __init__(self, session: requests.Session, console: Console, thread_id: str, thread_title: str, users: dict,
-                 last_item_sent: tuple, muted: bool, readed: bool) -> None:
+                 last_item_sent: tuple, muted: bool, readed: bool, debug:bool = False) -> None:
         """
         Constructor of the Thread class.
         :param session: Session that contain cookies and headers.
@@ -22,6 +22,7 @@ class Thread:
         :param last_item_sent: Last item that is print below the username in the inbox.
         :param muted: Is the thread muted.
         :param readed: Is the thread readed.
+        :param debug: Turn on or off debug mode.
         """
         self._session = session
         self._console = console
@@ -31,6 +32,7 @@ class Thread:
         self._last_item = last_item_sent
         self._muted = muted
         self._readed = readed
+        self._debug = debug
         self._items = []
 
         for user in users:
@@ -218,14 +220,16 @@ class Thread:
 
                 else:
                     # Ignore action_log item because they are not supposed to be displayed.
-                    if not item.get('item_type') == 'action_log':
+                    if not item.get('item_type') == 'action_log' and self._debug:
                         self._console.print(f'[bold red]Item type {item["item_type"]} not supported...[/]')
+                        self._console.print(f'{item}\n')
 
             # Sort every item by time.
             self._items.sort(key=lambda elt: elt.get_timestamp())
 
         else:
             self._console.print(f' -> [bold red]({req.status_code}) Error when fetching instagram server.[/]')
+            self._console.print(f'{req.content}')
 
     def show(self, thread_index: int):
         """

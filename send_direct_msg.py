@@ -3,7 +3,6 @@ import requests
 from rich.console import Console
 from rich.prompt import Prompt
 import shutil
-from HEADERS import BROADCAST_HEADERS
 
 
 BROADCAST_URL = 'https://www.instagram.com/api/v1/direct_v2/threads/broadcast/'
@@ -40,9 +39,7 @@ def send_item(session: requests.Session, text: str, thread_id: str, user_id:str 
     }
 
     # Make the request with a custom header to be able to send message and check if it was successful.
-    broadcast_session = requests.session()
-    response = broadcast_session.post(BROADCAST_URL + 'text/', data=data, 
-                                     headers=BROADCAST_HEADERS, cookies=session.cookies)
+    response = session.post(BROADCAST_URL + 'text/', data=data)
     if response.status_code == 200: 
         # Message sent successfully ! 
         return 1

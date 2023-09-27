@@ -7,10 +7,12 @@ import requests
 class Inbox:
     URL = 'https://i.instagram.com/api/v1/direct_v2/inbox/'
 
-    def __init__(self, console: Console, session: requests.Session, debug:bool = False) -> None:
+    def __init__(self, session: requests.Session, console: Console, debug:bool = False) -> None:
         """
         Constructor of the Inbox class.
         :param session: Session that contain cookies and headers.
+        :param console: Console object that contain every info on the current console.
+        :param debug: Turn on or off debug mode.
         """
         self._session = session
         self._console = console
@@ -48,7 +50,8 @@ class Inbox:
                                                 thread['users'],
                                                 format_last_item(self._session, thread['items'][0]),
                                                 thread['muted'],
-                                                thread['read_state']))
+                                                thread['read_state'],
+                                                self._debug))
 
             else:
                 self._console.print(f' -> [bold #ff0000]({req.status_code}) Error when fetching instagram server.[/]')

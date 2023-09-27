@@ -62,7 +62,7 @@ def get_session_id(console: Console) -> tuple:
     :return:
     """
 
-    console.print('[bold #1279e0 link=https://github.com/romainflcht/igdm_terminal#:~:text=To%20link%20your%20Instagram%20account]Où trouver mon session ID et mon CSRT Token Instagram Inc. ?[/]')
+    console.print('[bold #1279e0 link=https://github.com/romainflcht/igdm_terminal#:~:text=To%20link%20your%20Instagram%20account]Où trouver mon session ID et mon CSRF Token Instagram Inc. ?[/]')
 
     # Ask the information needed.
     session_id = Prompt.ask('Veuillez entrer votre [bold #e0c112]session ID Instagram Inc. [/]'
@@ -81,7 +81,7 @@ def save_session(console: Console, session_id: str, csrf_token: str) -> None:
     :param console: Console on which everything will be printed out.
     :param session_id: Session ID that need to be saved.
     :param csrf_token: CSRF Token that need to be saved.
-    :return: None
+    :return: None.
     """
 
     # Check if the user wnat to save it.

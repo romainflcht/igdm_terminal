@@ -4,11 +4,11 @@ from format_data import format_thread_selection
 from send_direct_msg import send_message
 from inbox import Inbox
 from login import login
-from HEADERS import MAIN_HEADERS
+from HEADERS import HEADERS
 
 # Create the request session that will be used for every component. 
 SESSION = requests.session()
-SESSION.headers.update(MAIN_HEADERS)
+SESSION.headers.update(HEADERS)
 
 # Console object were every print will be displayed. 
 CONSOLE = Console()
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     CONSOLE.print('\n' * 1000)
 
     # Get connection information and generate cookies for requests.
-    session_id, csrf_token = login(CONSOLE, MAIN_HEADERS)
+    session_id, csrf_token = login(CONSOLE, HEADERS)
     cookies = {
         'csrftoken': csrf_token,
         'sessionid': session_id,
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     SESSION.cookies.update(cookies)
 
     # Create inbox object.
-    inbox = Inbox(CONSOLE, SESSION)
+    inbox = Inbox(SESSION, CONSOLE, True)
 
     while 1: 
         # Fetch inbox datas. 
