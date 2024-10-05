@@ -1,6 +1,11 @@
 # igdm_terminal
 This project allows you to see your instagram direct messages on your terminal :)
 
+## Abandonned...
+<b>After several attempts, I have decided to abandon this project due to Instagram's highly advanced automatic behavior detection... Unfortunately, I don't have the time or determination to reverse-engineer their requests and bypass these restrictions.</b>
+
+<b>If you feel up to the challenge, don't hesitate to take over! This project is close to my heart, and I'd love to see it completed.🙂</b>
+
 ## Installation
 To install all the necessary libraries, you will need to use:
 ```bash
@@ -67,7 +72,7 @@ Here is some screenshots of the program running :
   <i>Conversations</i>
 </p>
 
-(proudly) Supported features : 
+<s>(proudly)</s> Supported features : 
 - 📄 Text
 - 🌐 Link
 - 🎬 Clip
@@ -78,7 +83,7 @@ Here is some screenshots of the program running :
 - 📹 Reel share
 - ⚠️ Placeholder
 - ❤️ Liked messages
-<s>- 📤 Sent direct message</s>
+- <s>📤 Sent direct message</s>
 
 ## Licence
 - romainflcht
