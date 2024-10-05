@@ -78,7 +78,7 @@ Here is some screenshots of the program running :
 - 📹 Reel share
 - ⚠️ Placeholder
 - ❤️ Liked messages
-- 📤 Sent direct message
+<s>- 📤 Sent direct message</s>
 
 ## Licence
 - romainflcht
